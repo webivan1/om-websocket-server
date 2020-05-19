@@ -1,13 +1,14 @@
 import * as http from "http";
 import * as express from "express";
+import * as exphbs from "express-handlebars";
 import { Application } from "express";
-// import * as bodyParser from "body-parser";
 
 const app: Application = express();
-const server = http.createServer(app);
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
+
+const server = http.createServer(app);
 
 export {
   app,

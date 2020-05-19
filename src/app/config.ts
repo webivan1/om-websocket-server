@@ -34,11 +34,35 @@ dotenv.config();
 export type ConfigType = {
   port: number;
   origin: string;
+  timezone: string;
+  redis: {
+    host: string;
+    port: number;
+  },
+  db: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    dbName: string;
+  }
 }
 
 const config: ConfigType = {
   port: process.env.PORT ? +process.env.PORT : 8080,
   origin: process.env.CORS || '*:*',
+  timezone: process.env.TIMEZONE || '+00:00',
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: process.env.REDIS_PORT ? +process.env.REDIS_PORT : 6379
+  },
+  db: {
+    host: process.env.DB_HOST || '127.0.0.1:3306',
+    port: process.env.DB_PORT ? +process.env.DB_PORT : 3306,
+    user: process.env.DB_USER || 'user',
+    password: process.env.DB_PASSWORD || 'secret',
+    dbName: process.env.DB_NAME || '',
+  }
 }
 
 export default config;

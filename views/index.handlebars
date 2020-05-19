@@ -1,0 +1,78 @@
+<div id="app" data-event='{{ eventJson }}'>
+    <h2>
+        {{ event.title }}
+    </h2>
+
+    <p id="coords"></p>
+
+    <p>
+        Total users <span id="total">0</span>
+    </p>
+
+    <label>
+        <input disabled type="checkbox" id="online"/> Are you online?
+    </label>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    (function () {
+        const event = JSON.parse(document.querySelector('#app').getAttribute('data-event'))
+
+        const socket = io('http://localhost:9001', {
+            rememberUpgrade: true,
+            transports: ['websocket'],
+            secure: true,
+            rejectUnauthorized: false,
+            query: {
+                eventId: event.id,
+                duration: Math.ceil((event.finishedAt - event.startAt) / 1000 / 60 / 60),
+                finishedAt: event.finishedAt,
+                startAt: event.startAt,
+                timezone: '+03:00'
+            }
+        });
+
+        const field = document.querySelector('#online');
+        const totalUsers = document.querySelector('#total');
+
+        let coords = null;
+
+        socket.emit('get total');
+        socket.on('total connection', total => totalUsers.innerText = total);
+
+        navigator.geolocation.getCurrentPosition(position => {
+            coords = position.coords;
+            field.removeAttribute('disabled');
+            document.querySelector('#coords').innerText = JSON.stringify({
+                lat: coords.latitude,
+                lng: coords.longitude
+            });
+        }, () => {
+            alert('You must show your coordinates');
+        });
+
+        function randomCoordinates(lat, long) {
+            const value = (Math.random() * 10) >= 5 ? 1 : -1;
+            const newLat = lat + (Math.random() / 4 * value);
+            const newlong = long + (Math.random() / 3 * value);
+            return [newLat, newlong];
+        }
+
+        field.onchange = () => {
+            if (coords) {
+                if (field.checked) {
+                    socket.emit('add connection', {
+                        lat: coords.latitude,
+                        lng: coords.longitude
+                    });
+                } else {
+                    socket.emit('remove connection');
+                }
+            } else {
+                alert('You must show your coordinates');
+            }
+        };
+    })();
+</script>
