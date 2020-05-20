@@ -6,9 +6,11 @@ type EnvModeFilesType = {
   [key: string]: string;
 }
 
+type ModeType = 'production' | 'development';
+
 let envFile = path.resolve(process.cwd(), '.env');
 
-const envMode: string = process.env.NODE_ENV || '';
+const envMode: ModeType = process.env.NODE_ENV === 'development' ? 'development' : 'production';
 
 const envFiles: EnvModeFilesType = {
   development: path.resolve(process.cwd(), '.env.development'),
@@ -32,6 +34,7 @@ dotenv.config({
 dotenv.config();
 
 export type ConfigType = {
+  mode: ModeType;
   host: string;
   port: number;
   origin: string;
@@ -50,6 +53,7 @@ export type ConfigType = {
 }
 
 const config: ConfigType = {
+  mode: envMode,
   host: process.env.HOST || 'localhost',
   port: process.env.PORT ? +process.env.PORT : 8080,
   origin: process.env.CORS || '*:*',
