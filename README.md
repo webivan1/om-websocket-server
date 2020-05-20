@@ -1,9 +1,8 @@
 ## Install 
 
-1) npm install -g yarn
-2) npm install
+1) npm install
 
 ## Run
 
-- yarn dev `for development`
-- yarn start `for production`
+- npm run dev `for development`
+- npm start `for production`

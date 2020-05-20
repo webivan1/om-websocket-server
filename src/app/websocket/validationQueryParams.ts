@@ -21,7 +21,7 @@ const rules = {
   timezone: {
     presence: true,
     format: {
-      pattern: /^(\+|-){1}\d{1,2}\:00$/
+      pattern: /^(\+|-)\d{1,2}\:00$/
     }
   }
 }

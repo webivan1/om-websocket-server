@@ -32,6 +32,7 @@ dotenv.config({
 dotenv.config();
 
 export type ConfigType = {
+  host: string;
   port: number;
   origin: string;
   timezone: string;
@@ -49,6 +50,7 @@ export type ConfigType = {
 }
 
 const config: ConfigType = {
+  host: process.env.HOST || 'localhost',
   port: process.env.PORT ? +process.env.PORT : 8080,
   origin: process.env.CORS || '*:*',
   timezone: process.env.TIMEZONE || '+00:00',

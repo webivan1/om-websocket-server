@@ -4,6 +4,8 @@ import * as moment from "moment";
 import { Server } from "http";
 import { Socket } from "socket.io";
 import StorageRedis from "../storage/StorageRedis";
+import { DB } from "../db";
+import { EventModel } from "../db/event/EventModel";
 import { isValidateParams } from "./validationQueryParams";
 import config from "../config";
 
@@ -18,8 +20,6 @@ import {
   ComputeBoundsType,
   RequestQueryParamsType
 } from "../types";
-import { DB } from "../db";
-import { EventModel } from "../db/event/EventModel";
 
 export default class Websocket {
 

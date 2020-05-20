@@ -57,6 +57,6 @@ const websocket = new Websocket(server);
 websocket.listen();
 websocket.runLogger();
 
-server.listen(config.port, () => {
-  console.log('Server started', config.port, process.env.NODE_ENV);
+server.listen(config.port, config.host, () => {
+  console.log('Server started', `${config.host}:${config.port}`, process.env.NODE_ENV);
 });
