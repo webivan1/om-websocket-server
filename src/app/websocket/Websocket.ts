@@ -3,16 +3,13 @@ import * as redisSocketIO  from "socket.io-redis";
 import * as moment from "moment";
 import { Server } from "http";
 import { Socket } from "socket.io";
-import StorageRedis from "../storage/StorageRedis";
-import { DB } from "../db";
-import { EventModel } from "../db/event/EventModel";
+import { DB } from "../mysql";
+import { EventModel } from "../mysql/event/EventModel";
 import { isValidateParams } from "./validationQueryParams";
-import config from "../config";
+import config from "../config"
 
 // Types
-import {
-  IStorage
-} from "../storage/IStorage";
+import { IStorage } from "../storage/IStorage";
 import {
   IdType,
   LatLngType,
@@ -25,10 +22,10 @@ export default class Websocket {
 
   public redis: redisSocketIO.RedisAdapter;
   public io: socketInit.Server;
-  public storage: IStorage;
+  public static storage: IStorage;
   public eventList: RequestQueryParamsType[] = [];
 
-  constructor(server: Server) {
+  constructor(server: Server, storage: IStorage) {
     this.redis = redisSocketIO({
       key: 'websocket_',
       host: config.redis.host,
@@ -38,7 +35,7 @@ export default class Websocket {
     const io = socketInit(server);
     this.io = io.adapter(this.redis);
 
-    this.storage = new StorageRedis();
+    Websocket.storage = storage;
   }
 
   public listen() {
@@ -81,7 +78,7 @@ export default class Websocket {
   }
 
   protected sendTotalConnection(socket: Socket, eventId: number): void {
-    this.storage.total(eventId).then(total => {
+    Websocket.storage.total(eventId).then(total => {
       this.io.to(String(eventId)).emit('total connection', total);
     });
   }
@@ -90,7 +87,7 @@ export default class Websocket {
     return (coords: LatLngType) => {
       const connection: ConnectionType = {...coords, id};
 
-      this.storage.set(eventId, id, connection).then(() => {
+      Websocket.storage.set(eventId, id, connection).then(() => {
         this.io.to(String(eventId)).emit('map new connection', {...connection});
         this.sendTotalConnection(socket, eventId);
       });
@@ -99,34 +96,21 @@ export default class Websocket {
 
   protected handlerRemoveConnection(socket: Socket, eventId: number, id: IdType): () => void {
     return () => {
-      this.storage.get(eventId, id).then(async item => {
+      Websocket.storage.get(eventId, id).then(async item => {
         this.io.to(String(eventId)).emit('map remove connection', {...item});
-        await this.storage.remove(eventId, id);
+        await Websocket.storage.remove(eventId, id);
         this.sendTotalConnection(socket, eventId);
       });
     }
   }
 
   protected handlerGetAllConnections(socket: Socket, eventId: number): (border: ComputeBoundsType) => void {
-    return (border: ComputeBoundsType) => {
-      this.storage.all(eventId).then(connections => {
-        if (connections) {
-          let groupConnections: ConnectionType[] = [];
+    return async (border: ComputeBoundsType) => {
+      const iterator = Websocket.storage.chunk(eventId, 200, border);
 
-          connections.forEach(connection => {
-            if (this.isPointBetweenPoints(connection, border)) {
-              groupConnections.push({...connection});
-
-              if (groupConnections.length > 50) {
-                this.sendAndClearConnections(socket, groupConnections, eventId);
-                groupConnections = [];
-              }
-            }
-          });
-
-          this.sendAndClearConnections(socket, groupConnections, eventId);
-        }
-      });
+      for await (const groupConnections of iterator) {
+        this.sendAndClearConnections(socket, groupConnections, eventId);
+      }
     }
   }
 
@@ -134,11 +118,6 @@ export default class Websocket {
     if (connections.length > 0) {
       socket.emit('map group connections', [...connections]);
     }
-  }
-
-  public isPointBetweenPoints(connection: ConnectionType, border: ComputeBoundsType): boolean {
-    return (border.from.lat <= connection.lat && border.from.lng <= connection.lng) &&
-      (border.to.lat >= connection.lat && border.to.lng >= connection.lng);
   }
 
   public isNotStarting(beginAt: number, timezone: string): boolean {
@@ -164,7 +143,7 @@ export default class Websocket {
 
   protected logger() {
     this.eventList.forEach(async ({ finishedAt, timezone, eventId, duration }, index) => {
-      const total = await this.storage.total(eventId);
+      const total = await Websocket.storage.total(eventId);
 
       if (total > 0) {
         await this.safeLog(eventId, total);
@@ -172,7 +151,7 @@ export default class Websocket {
 
       if (this.isFinishedEvent(finishedAt, timezone)) {
         this.eventList.splice(index, 1);
-        await this.storage.removeAll(eventId);
+        await Websocket.storage.removeAll(eventId);
       }
     });
   }

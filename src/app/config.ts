@@ -49,6 +49,13 @@ export type ConfigType = {
     user: string;
     password: string;
     dbName: string;
+  },
+  mongo: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    dbName: string;
   }
 }
 
@@ -68,6 +75,13 @@ const config: ConfigType = {
     user: process.env.DB_USER || 'user',
     password: process.env.DB_PASSWORD || 'secret',
     dbName: process.env.DB_NAME || '',
+  },
+  mongo: {
+    host: process.env.MONGO_HOST || '127.0.0.1:3306',
+    port: process.env.MONGO_PORT ? +process.env.MONGO_PORT : 27017,
+    user: process.env.MONGO_USER || 'user',
+    password: process.env.MONGO_PASSWORD || 'secret',
+    dbName: process.env.MONGO_DB_NAME || '',
   }
 }
 
