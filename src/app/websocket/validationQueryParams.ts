@@ -23,7 +23,23 @@ const rules = {
     format: {
       pattern: /^(\+|-)\d{1,2}\:00$/
     }
-  }
+  },
+  borderFromLat: {
+    presence: true,
+    numericality: true
+  },
+  borderFromLng: {
+    presence: true,
+    numericality: true
+  },
+  borderToLat: {
+    presence: true,
+    numericality: true
+  },
+  borderToLng: {
+    presence: true,
+    numericality: true
+  },
 }
 
 export const isValidateParams = (params: RequestQueryParamsType): boolean => {

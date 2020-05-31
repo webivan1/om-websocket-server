@@ -1,11 +1,17 @@
 export type IdType = string;
 
+export type ConnectionUserIdType = {
+  userId: string;
+}
+
 export type LatLngType = {
   lat: number;
   lng: number;
 };
 
-export type ConnectionType = LatLngType & {
+export type NewConnectionType = ConnectionUserIdType & LatLngType;
+
+export type ConnectionType = ConnectionUserIdType & LatLngType & {
   id: IdType
 };
 
@@ -20,4 +26,8 @@ export type RequestQueryParamsType = {
   finishedAt: number;
   startAt: number;
   timezone: string;
+  borderFromLat: number,
+  borderFromLng: number,
+  borderToLat: number,
+  borderToLng: number,
 }

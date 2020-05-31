@@ -7,29 +7,37 @@ export default class StorageMongo implements IStorage {
 
   protected getObjectFromModel(model: IStorageModel): ConnectionType {
     return {
-      id: model.userId,
+      id: model.connectionId,
+      userId: model.userId,
       lat: model.lat,
       lng: model.lng
     }
   }
 
   public async get(eventId: number, id: IdType): Promise<ConnectionType|null> {
-    const model = await StorageModel.findOne({ userId: id, eventId }).exec();
+    const model = await StorageModel.findOne({ connectionId: id, eventId }).exec();
     return model ? this.getObjectFromModel(model) : null;
   }
 
   public async set(eventId: number, id: IdType, connection: ConnectionType): Promise<boolean> {
-    await StorageModel.findOneAndDelete({ eventId, userId: id });
+    // check user is already registered
+    const user = await StorageModel.findOne({ eventId, userId: connection.userId });
+
+    if (user) {
+      return false;
+    }
+
     return !! await StorageModel.create({
       eventId,
-      userId: id,
+      connectionId: id,
+      userId: connection.userId,
       lat: connection.lat,
       lng: connection.lng
     });
   }
 
   public async remove(eventId: number, id: IdType): Promise<true> {
-    await StorageModel.deleteOne({ eventId, userId: id }).exec();
+    await StorageModel.deleteOne({ eventId, connectionId: id }).exec();
     return true;
   }
 

@@ -15,7 +15,7 @@ import { connect } from "./mongo/connect";
 (async () => {
   await connect();
 
-  const websocket = new Websocket(server, new StorageRedis());
+  const websocket = new Websocket(server, new StorageMongo());
   websocket.listen();
   websocket.runLogger();
 

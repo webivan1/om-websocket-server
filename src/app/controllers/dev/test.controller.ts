@@ -8,6 +8,7 @@ export const testDevController = (eventId: number, total: number, lat: number, l
 
   for (let i = 0; i < total; i++) {
     const id = uuid4();
-    storage.set(eventId, id, {...fakeCoordinates({ lat, lng }), id }).then();
+    const userId = uuid4();
+    storage.set(eventId, id, {...fakeCoordinates({ lat, lng }), id, userId }).then();
   }
 }
