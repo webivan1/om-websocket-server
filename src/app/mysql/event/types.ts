@@ -5,6 +5,14 @@ export enum EventStatuses {
   'approved' = 'approved'
 }
 
+export type RegionType = {
+  label: string;
+  slug: string;
+  lat: number;
+  lng: number;
+  distance: number;
+};
+
 export type EventType = {
   id: number;
   interval: number; // hours
@@ -19,6 +27,7 @@ export type EventType = {
   status: keyof typeof EventStatuses;
   finish_at: string;
   start_at: string;
+  region: RegionType;
 };
 
 export type LogParamsType = {

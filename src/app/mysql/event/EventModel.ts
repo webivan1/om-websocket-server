@@ -1,5 +1,5 @@
 import { Connection, Pool } from "mysql2/promise";
-import { EventType, LogParamsType } from "./types";
+import { EventType, LogParamsType, RegionType } from "./types";
 
 export class EventModel {
 
@@ -14,7 +14,20 @@ export class EventModel {
     const sql = `SELECT * FROM ${this.tableName} WHERE id = ?`;
     const [rows] = await this.connection.query(sql, [id]);
     // @ts-ignore
-    return rows[0] || null;
+    let event: EventType|null = rows[0];
+
+    if (event) {
+      const sqlRegion = `SELECT * FROM regions WHERE id = ?`;
+      const [rows] = await this.connection.query(sql, [event.id]);
+      // @ts-ignore
+      const region: RegionType|null = rows[0];
+
+      if (region) {
+        event = {...event, region};
+      }
+    }
+
+    return event;
   }
 
   async addLog(params: LogParamsType) {

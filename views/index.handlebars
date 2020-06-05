@@ -30,7 +30,11 @@
                 duration: Math.ceil((event.finishedAt - event.startAt) / 1000 / 60 / 60),
                 finishedAt: event.finishedAt,
                 startAt: event.startAt,
-                timezone: '+03:00'
+                timezone: '+03:00',
+                borderFromLat: event.borderFromLat,
+                borderFromLng: event.borderFromLng,
+                borderToLat: event.borderToLat,
+                borderToLng: event.borderToLng,
             }
         });
 

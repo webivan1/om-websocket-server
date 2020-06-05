@@ -4,7 +4,6 @@ import Websocket from "./websocket/Websocket";
 
 // Storage
 import StorageMongo from "./storage/StorageMongo";
-import StorageRedis from "./storage/StorageRedis";
 
 // Routes
 import { routes } from "./routes";

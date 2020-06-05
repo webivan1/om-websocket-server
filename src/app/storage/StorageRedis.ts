@@ -5,6 +5,9 @@ import config from "../config";
 import { IStorage } from "./IStorage";
 import { ComputeBoundsType, ConnectionType, IdType } from "../types";
 
+/**
+ * @deprecated
+ */
 export default class StorageRedis implements IStorage {
 
   private server: RedisClient;

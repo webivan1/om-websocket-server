@@ -16,7 +16,8 @@ import {
   IdType,
   ConnectionType,
   ComputeBoundsType,
-  RequestQueryParamsType, NewConnectionType
+  RequestQueryParamsType,
+  NewConnectionType
 } from "../types";
 
 export default class Websocket {
